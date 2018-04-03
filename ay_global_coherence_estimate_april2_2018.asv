@@ -1,0 +1,53 @@
+clear all
+% %% Generate data BY Dr code
+load('eeganes07laplac250_detrend_all.mat')
+sample_rate = 250;     % Sampling Rate 
+data_length = 9267.8;  % Data Length in Seconds
+
+%load('test_data')
+ch_jump    = 32;
+
+%% Model Setting for PNAS
+StateIter  = 25;
+GammaIter  = 100;
+Ns         = 128;
+Wnd        = 2048;
+Freq       = (10:150)/Wnd; %(1:1024)/Wnd; 
+
+part_data  = [2.5e4   size(data_det,1)-2.5e4];
+kk=1;
+%data_det_x = data_det(1:4.5e5,1:ch_jump:end);
+data_det_x = data_det(part_data(kk,1):part_data(kk,2),1:ch_jump:end);
+%% Run Filter First
+[XF,base_filt]  = ay_global_coherence_methods_filter(data_det_x',Wnd,Freq);
+
+%% Method 0
+method = 0;
+Bins   = 8; 
+COH = ay_global_coherence_methods_global_coherence(method,XF,Bins);
+[COH_F,ParamFilter] = ay_global_coherence_methods_gamma_filter(COH,GammaIter);
+save(['Part_0_' num2str(kk)],'data_det','data_det_x','COH','COH_F');
+
+%% PNA without mean dropped
+method = 1;
+COH    = ay_global_coherence_methods_global_coherence(method,XF,Bins);
+[COH_F,ParamFilter] = ay_global_coherence_methods_gamma_filter(COH,GammaIter);
+save(['Part_1_' num2str(kk)],'COH','COH_F');
+
+
+%% State Space
+[XF,ParamState] = ay_global_coherence_methods_state_space(XF,StateIter,Ns);
+
+
+%% Model Setting for State Space Model Method 2
+method = 2;
+Bins   = 1;
+COH    = ay_global_coherence_methods_global_coherence(method,XF,Bins);
+[COH_F,ParamFilter] = ay_global_coherence_methods_gamma_filter(COH,GammaIter);
+save(['Part_2_' num2str(kk)],'COH','COH_F');
+
+%% Model Setting for State Space Model Method 3
+method = 3;
+COH    = ay_global_coherence_methods_global_coherence(method,XF,Bins);
+[COH_F,ParamFilter] = ay_global_coherence_methods_gamma_filter(COH,GammaIter);
+save(['Part_3_' num2str(kk)],'COH','COH_F');

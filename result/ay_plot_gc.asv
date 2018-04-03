@@ -1,0 +1,29 @@
+Wnd        = 2048;
+Freq       = 250*(10:150)/Wnd; %(1:1024)/Wnd; 
+load('Part_1_4');
+COH_A  = COH;
+COHF_A = COH_F;
+
+load('Part_2_4');
+COH_B  = COH;
+COHF_B = COH_F;
+
+load('Part_3_4');
+COH_C  = COH;
+COHF_C = COH_F;
+
+
+subplot(3,1,1)
+imagesc(Freq,COH_A');
+colorbar
+colormap('jet')
+
+subplot(3,1,2)
+imagesc(Freq,COH_B');
+colorbar
+colormap('jet')
+
+subplot(3,1,3)
+imagesc(Freq,COH_C');
+colorbar
+colormap('jet')
